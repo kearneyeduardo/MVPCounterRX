@@ -1,7 +1,10 @@
 package com.globant.counter.android.mvp.presenter;
 
 import android.app.Activity;
+import android.content.Context;
+import android.view.inputmethod.InputMethodManager;
 
+import com.globant.counter.android.util.bus.observers.AddButtonObserver;
 import com.globant.counter.android.util.bus.observers.CountButtonUpBusObserver;
 import com.globant.counter.android.util.bus.observers.ResetButtonObserver;
 import com.globant.counter.android.util.bus.RxBus;
@@ -26,6 +29,17 @@ public class CountPresenter {
     public void onResetButtonPressed() {
         model.reset();
         view.setCount(String.valueOf(model.getCount()));
+        view.setResult("0");
+    }
+
+    public void onAddButtonPressed() {
+        if(view.validateFields()) {
+            view.setResult(String.valueOf(model.getResult(view.getFirstValue(), view.getSecondValue())));
+        } else {
+            view.setResult("0");
+        }
+        InputMethodManager imm = (InputMethodManager)view.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getActivity().getCurrentFocus().getWindowToken(), 0);
     }
 
     public void register() {
@@ -49,6 +63,12 @@ public class CountPresenter {
             }
         });
 
+        RxBus.subscribe(activity, new AddButtonObserver() {
+            @Override
+            public void onEvent(AddButtonPressed value) {
+                onAddButtonPressed();
+            }
+        });
     }
 
     public void unregister() {

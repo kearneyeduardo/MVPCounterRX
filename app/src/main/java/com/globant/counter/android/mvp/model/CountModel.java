@@ -16,4 +16,8 @@ public class CountModel {
         return count;
     }
 
+    public int getResult(int a, int b) {
+        return a + b;
+    }
+
 }
